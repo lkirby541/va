@@ -1,0 +1,66 @@
+groups:
+- name: profit-alerts
+  rules:
+  - alert: LowProfitMargin
+    expr: avg(profit_margin) < 0.5
+    for: 1h
+    labels:
+      severity: critical
+      component: pricing
+    annotations:
+      summary: "Profit margin below 50% threshold"
+      description: "Current profit margin is {{ $value }}% - Review pricing strategy immediately"
+
+  - alert: HighAPIErrorRate
+    expr: (sum(rate(api_errors_total[5m])) / sum(rate(api_requests_total[5m]))) > 0.05
+    for: 15m
+    labels:
+      severity: warning
+      component: infrastructure
+    annotations:
+      summary: "High API error rate detected"
+      description: "API error rate is {{ $value }}% - Check service health"
+
+- name: inventory-alerts
+  rules:
+  - alert: StaleInventory
+    expr: avg(inventory_age_days) > 7
+    for: 6h
+    labels:
+      severity: warning
+      component: inventory
+    annotations:
+      summary: "Inventory not selling"
+      description: "Average inventory age is {{ $value }} days - Consider discounts"
+
+  - alert: LowConversionRate
+    expr: (sum(conversions_total) / sum(page_views_total)) < 0.02
+    for: 12h
+    labels:
+      severity: critical
+      component: sales
+    annotations:
+      summary: "Low conversion rate"
+      description: "Current conversion rate is {{ $value }}% - Review product listings"
+
+- name: system-alerts
+  rules:
+  - alert: HighCPULoad
+    expr: node_load1 > 2
+    for: 30m
+    labels:
+      severity: warning
+      component: infrastructure
+    annotations:
+      summary: "High CPU load detected"
+      description: "CPU load average is {{ $value }}"
+
+  - alert: MemoryPressure
+    expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) < 0.2
+    for: 15m
+    labels:
+      severity: warning
+      component: infrastructure
+    annotations:
+      summary: "Low available memory"
+      description: "Only {{ $value }}% memory available"

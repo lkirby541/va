@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  va:
+    build: ./docker
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config
+    ports:
+      - "8443:8443"
+      - "3000:3000"
+    environment:
+      - ENV=production
+    restart: unless-stopped
+
+  monitor:
+    image: grafana/grafana
+    volumes:
+      - ./monitoring/dashboards:/var/lib/grafana/dashboards
+    ports:
+      - "3000:3000"
+    depends_on:
+      - va
+
+  redis:
+    image: redis:alpine
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:
+  config:
